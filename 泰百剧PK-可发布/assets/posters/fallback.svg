@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800" viewBox="0 0 600 800">
-  <rect width="600" height="800" fill="#f7edf1"/>
-  <path d="M0 590C140 500 224 684 390 590c94-53 151-33 210-4v214H0Z" fill="#e8c5cf"/>
-  <circle cx="474" cy="146" r="108" fill="#cad9d2"/>
-  <circle cx="116" cy="246" r="54" fill="#eeb7bd"/>
-  <path d="M300 324c-55-69-156 3-97 78l97 106 97-106c59-75-42-147-97-78Z" fill="#c94f68" opacity=".9"/>
-  <text x="300" y="684" text-anchor="middle" fill="#713746" font-size="30" font-family="sans-serif">海报待更新</text>
-</svg>
