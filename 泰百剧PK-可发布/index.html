@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>泰百剧4选1 PK｜选出你的最爱TOP5</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:#262522;background:#f7f5f2;}
+body{min-height:100vh;padding:32px 24px 48px;background:linear-gradient(180deg,#f7f5f2 0,#fff 72%);}
+h1{font-size:clamp(26px,4vw,38px);font-weight:750;line-height:1.2;text-align:center;color:#282522;}
+.tip{max-width:660px;margin:10px auto 18px;color:#65615d;line-height:1.6;text-align:center;}
+.progress{margin-bottom:8px;color:#65615d;text-align:center;font-size:14px;font-variant-numeric:tabular-nums;}
+.progress-track{width:min(480px,100%);height:6px;margin:0 auto 30px;overflow:hidden;border-radius:3px;background:#e3dfda;}
+.progress-track span{display:block;width:0;height:100%;background:#b74761;transition:width .25s ease;}
+.wrap{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;max-width:1120px;margin:0 auto;}
+.card{min-width:0;overflow:hidden;border:1px solid #e7e2dc;border-radius:8px;background:#fff;color:#262522;box-shadow:0 2px 10px #342b2110;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;}
+.card:hover{transform:translateY(-4px);border-color:#c38b98;box-shadow:0 8px 24px #342b211c;}
+.card:focus-visible{outline:3px solid #2d7163;outline-offset:3px;}
+.card img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;background:#f0ebe7;}
+.card img.contain{object-fit:contain;background:#ded7d2;}
+.card .name{display:grid;min-height:58px;place-items:center;padding:10px 8px;text-align:center;font-size:15px;font-weight:650;line-height:1.35;}
+.result-box{display:none;max-width:680px;margin:36px auto 0;padding:28px;border:1px solid #e7e2dc;border-radius:8px;background:#fff;box-shadow:0 8px 30px #342b2110;}
+.result-box h2{margin-bottom:16px;text-align:center;font-size:24px;}
+.rank-item{padding:12px 2px;border-bottom:1px solid #ece7e2;font-size:16px;line-height:1.5;}
+.btns{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:24px;text-align:center;}
+.btns button{min-height:44px;padding:10px 20px;border:0;border-radius:6px;background:#b74761;color:#fff;font-size:15px;font-weight:650;cursor:pointer;}
+.btns button:last-child{background:#e6efeb;color:#235a4f;}
+.btns button:hover{filter:brightness(.96);}
+.btns button:focus-visible{outline:3px solid #2d7163;outline-offset:2px;}
+@media (max-width:720px){body{padding:24px 14px 36px}.wrap{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card .name{min-height:54px;font-size:14px}.result-box{padding:22px 18px}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<h1>泰百剧 4选1 PK</h1>
+<div class="tip">不用想太多，凭直觉选最喜欢的一部，结束自动算出你的最爱TOP5 ♡</div>
+<div class="progress" id="progressText"></div>
+<div class="progress-track" role="progressbar" aria-label="选择进度" aria-valuemin="0" aria-valuemax="80" aria-valuenow="0"><span id="progressBar"></span></div>
+
+<div class="wrap" id="pkWrap"></div>
+
+<div class="result-box" id="resultBox">
+  <h2>✨ 你的最爱TOP5 ✨</h2>
+  <div id="rankList"></div>
+  <div class="btns">
+    <button type="button" onclick="copyResult()">复制排名分享</button>
+    <button type="button" onclick="restart()">重新选一次</button>
+  </div>
+</div>
+
+<script>
+// 73 部泰百剧清单；已确认的海报保存在本地 assets/posters 目录。
+const dramaList = [
+  {name:"粉红理论",img:"assets/posters/01.jpg"},
+  {name:"只想说爱你",img:"assets/posters/02.jpg"},
+  {name:"你是我的小幸运",img:"assets/posters/03.jpg"},
+  {name:"学姐可以爱我吗",img:"assets/posters/04.jpg"},
+  {name:"爱填满空白",img:"assets/posters/05.jpg"},
+  {name:"地球倾斜 23.5 度",img:"assets/posters/06.jpg"},
+  {name:"梦中的她",img:"assets/posters/07.jpg"},
+  {name:"荆棘之恋",img:"assets/posters/08.jpg"},
+  {name:"我们的秘密",img:"assets/posters/09.jpg"},
+  {name:"簪定此生",img:"assets/posters/10.jpg"},
+  {name:"逆转时空爱上你",img:"assets/posters/11.jpg"},
+  {name:"爱情诡计",img:"assets/posters/12.jpg"},
+  {name:"解锁你的爱",img:"assets/posters/13.jpg"},
+  {name:"珍爱禁果",img:"assets/posters/14.jpg"},
+  {name:"冥王星之恋",img:"assets/posters/15.jpg"},
+  {name:"月下禁爱",img:"assets/posters/16.jpg"},
+  {name:"我的青梅是讨厌鬼",img:"assets/posters/17.jpg"},
+  {name:"学姐可以爱我吗 - 特别篇",img:"assets/posters/18.jpg"},
+  {name:"铁锈味的雨滴",img:"assets/posters/19.jpg"},
+  {name:"我是恶魔",img:"assets/posters/20.jpg"},
+  {name:"穿越时光爱上你",img:"assets/posters/21.jpg"},
+  {name:"云月奇缘",img:"assets/posters/22.jpg"},
+  {name:"我们的爱",img:"assets/posters/23.jpg"},
+  {name:"忘情之谊",img:"assets/posters/24.jpg"},
+  {name:"鲸鱼杂货铺",img:"assets/posters/25.jpg"},
+  {name:"我是恶魔 S1+S2",img:"assets/posters/26.jpg"},
+  {name:"被拒绝的爱",img:"assets/posters/27.jpg"},
+  {name:"和谐密语",img:"assets/posters/28.jpg"},
+  {name:"只有你",img:"assets/posters/29.jpg"},
+  {name:"过山车",img:"assets/posters/30.jpg"},
+  {name:"固执的爱",img:"assets/posters/31.jpg"},
+  {name:"女王互换记",img:"assets/posters/32.jpg"},
+  {name:"无限的爱",img:"assets/posters/33.jpg"},
+  {name:"过量的爱",img:"assets/posters/34.jpg"},
+  {name:"爱情设计",img:"assets/posters/35.jpg"},
+  {name:"无法抗拒的爱",img:"assets/posters/36.jpg"},
+  {name:"危险女王",img:"assets/posters/37.jpg"},
+  {name:"爱的港湾",img:"assets/posters/38.jpg"},
+  {name:"危情任务",img:"assets/posters/39.jpg"},
+  {name:"爱情毒药",img:"assets/posters/40.jpg"},
+  {name:"以善赢心",img:"assets/posters/41.jpg"},
+  {name:"狱乱情迷",img:"assets/posters/42.jpg"},
+  {name:"简要成为校园之星",img:"assets/posters/43.jpg"},
+  {name:"号码奇缘",img:"assets/posters/44.jpg"},
+  {name:"大地情缘",img:"assets/posters/45.jpg"},
+  {name:"只属于我的天使",img:"assets/posters/46.jpg"},
+  {name:"我要成为超级巨星",img:"assets/posters/47.jpg"},
+  {name:"心动撞上冰山",img:"assets/posters/48.jpg"},
+  {name:"心知密码",img:"assets/posters/49.jpg"},
+  {name:"游乐园",img:"assets/posters/50.jpg"},
+  {name:"我唯一的阳光",img:"assets/posters/51.jpg"},
+  {name:"女孩规则",img:"assets/posters/52.jpg"},
+  {name:"水之魅影",img:"assets/posters/53.jpg"},
+  {name:"破碎的爱",img:"assets/posters/54.jpg"},
+  {name:"乡村罗曼史",img:"assets/posters/55.jpg"},
+  {name:"女校风云",img:"assets/posters/56.jpg"},
+  {name:"让爱圆满",img:"assets/posters/57.jpg"},
+  {name:"宿敌恋人",img:"assets/posters/58.jpg"},
+  {name:"再次为你",img:"assets/posters/59.jpg"},
+  {name:"风之恋歌",img:"assets/posters/60.jpg"},
+  {name:"追逐爱情",img:"assets/posters/61.jpg"},
+  {name:"顽皮小姐的贴身保镖",img:"assets/posters/62.jpg"},
+  {name:"绘梦婚礼",img:"assets/posters/63.jpg"},
+  {name:"机器人女友",img:"assets/posters/64.jpg",fit:"contain"},
+  {name:"火之爱链",img:"assets/posters/65.jpg"},
+  {name:"月下之影",img:"assets/posters/66.jpg"},
+  {name:"朱丽叶与朱丽叶",img:"assets/posters/67.jpg"},
+  {name:"爱在球道上",img:"assets/posters/68.jpg"},
+  {name:"镇灵",img:"assets/posters/69.jpg"},
+  {name:"可以爱吗",img:"assets/posters/70.jpg"},
+  {name:"第三者",img:"assets/posters/71.jpg"},
+  {name:"筑爱于心",img:"assets/posters/72.jpg"},
+  {name:"分手代理",img:"assets/posters/73.jpg"},
+];
+const MAX_ROUND = 80; // 4选1推荐60~100轮，数字越大排名越稳定
+// ======================================================
+let score = {};
+let currentRound = 0;
+let topResultText = "";
+dramaList.forEach(d=>score[d.name]=0);
+
+// 随机抽取4部互不重复的剧
+function getRandomFour(){
+  const selected = [];
+  while(selected.length < 4){
+    const idx = Math.floor(Math.random()*dramaList.length);
+    if(!selected.includes(dramaList[idx])){
+      selected.push(dramaList[idx]);
+    }
+  }
+  return selected;
+}
+
+function renderPK(){
+  const wrap=document.getElementById('pkWrap');
+  const box=document.getElementById('resultBox');
+  const progress=document.getElementById('progressText');
+  const progressBar=document.getElementById('progressBar');
+  box.style.display='none';
+  progress.innerText=`进度：${currentRound} / ${MAX_ROUND}`;
+  progressBar.style.width=`${Math.min(100,currentRound/MAX_ROUND*100)}%`;
+  progressBar.parentElement.setAttribute('aria-valuenow',currentRound);
+  if(currentRound >= MAX_ROUND){
+    showResult();
+    return;
+  }
+  const fourList = getRandomFour();
+  let cardHtml = "";
+  fourList.forEach(item=>{
+    cardHtml += `
+      <button type="button" class="card" onclick="pick('${item.name}')" aria-label="选择 ${item.name}">
+        <img class="${item.fit || ''}" src="${item.img}" alt="${item.name} 海报" onerror="this.onerror=null;this.src='assets/posters/fallback.svg'">
+        <div class="name">${item.name}</div>
+      </button>
+    `
+  })
+  wrap.innerHTML = cardHtml;
+}
+
+function pick(name){
+  score[name]++;
+  currentRound++;
+  renderPK();
+}
+
+function showResult(){
+  document.getElementById('pkWrap').innerHTML='';
+  document.getElementById('progressText').innerText='✅ 全部选择完毕！';
+  document.getElementById('progressBar').style.width='100%';
+  const box=document.getElementById('resultBox');
+  box.style.display='block';
+  const sortArr = Object.entries(score).sort((x,y)=>y[1]-x[1]);
+  const top5 = sortArr.slice(0,5);
+  topResultText = "我的泰百剧TOP5：\n";
+  let html='';
+  top5.forEach((item,i)=>{
+    html += `<div class="rank-item">第${i+1}名：${item[0]}｜获得 ${item[1]} 票</div>`
+    topResultText += `第${i+1}名：${item[0]}\n`;
+  })
+  document.getElementById('rankList').innerHTML=html;
+}
+
+// 复制排名
+function copyResult(){
+  navigator.clipboard.writeText(topResultText).then(()=>{
+    alert("✅ 排名复制成功！发给同担吧");
+  }).catch(()=>{
+    alert("复制失败，手动复制：\n"+topResultText);
+  })
+}
+
+function restart(){
+  currentRound=0;
+  dramaList.forEach(d=>score[d.name]=0);
+  renderPK();
+}
+renderPK();
+</script>
+</body>
+</html>

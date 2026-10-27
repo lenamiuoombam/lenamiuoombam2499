@@ -1,0 +1,19 @@
+最快生成分享链接（Netlify Drop）
+
+1. 打开 https://app.netlify.com/drop
+2. 把“泰百剧PK”整个文件夹拖进页面。
+3. 等待上传完成，页面会立即显示一个 https://xxxx.netlify.app 链接。
+4. 把这个链接发给朋友即可。
+
+注意：不要只上传 index.html；assets 文件夹里存放了海报，也要一起上传。
+
+备选方案（GitHub Pages）
+
+1. 新建一个 GitHub 仓库，把本文件夹里的 index.html 和 assets 一起上传。
+2. 在仓库 Settings > Pages 中选择 Deploy from a branch。
+3. 选择 main 和 /(root)，保存后即可获得公开链接。
+
+海报说明
+
+- 73 部作品均已收录图片，网页加载时不依赖外站热链。
+- 后续要替换时，把新图片放进 assets/posters，并修改 index.html 中相应条目的 img 路径即可。
